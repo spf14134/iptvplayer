@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/iptvplayer/static/css/main.cc6e0428.css",
+    "main.js": "/iptvplayer/static/js/main.b79dfc83.js",
+    "static/media/VideoJS.eot": "/iptvplayer/static/media/VideoJS.f72fc39ed5340b2def6b.eot",
+    "static/media/logo.svg": "/iptvplayer/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
+    "index.html": "/iptvplayer/index.html",
+    "main.cc6e0428.css.map": "/iptvplayer/static/css/main.cc6e0428.css.map",
+    "main.b79dfc83.js.map": "/iptvplayer/static/js/main.b79dfc83.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.cc6e0428.css",
+    "static/js/main.b79dfc83.js"
+  ]
+}
