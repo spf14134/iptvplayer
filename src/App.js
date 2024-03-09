@@ -4,7 +4,7 @@ import videojs from "video.js";
 import TCPlayer from 'tcplayer.js';
 import 'tcplayer.js/dist/tcplayer.min.css';
 import {useEffect, useState} from "react";
-import {Col, Row, message, Button, List, Avatar, Progress} from "antd";
+import {Col, Row, message, Button, List, Avatar, Progress, FloatButton} from "antd";
 import moment from "moment";
 
 function App() {
@@ -157,7 +157,10 @@ function App() {
                                 <Progress percent={item.percent} size="small" format={()=>item.playTime} />
                             </List.Item>
                         )}
+                        style={{height:"calc(100vh - 50px)",overflowY:"auto"}}
+                        id="li"
                     />
+                    <FloatButton.BackTop target={()=>document.getElementById("li")} />
                 </Col>
             </Row>
         </div>
