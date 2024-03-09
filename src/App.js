@@ -4,7 +4,7 @@ import videojs from "video.js";
 import TCPlayer from 'tcplayer.js';
 import 'tcplayer.js/dist/tcplayer.min.css';
 import {useEffect, useState} from "react";
-import {Col, Row, message, Button, List, Avatar, Progress, FloatButton} from "antd";
+import {Col, Row, message, Button, List, Avatar, Progress, FloatButton, Modal} from "antd";
 import moment from "moment";
 
 function App() {
@@ -13,6 +13,9 @@ function App() {
     const [listSize,setListSize] = useState(0);
     const [manifest, setManifest] = useState();
     const [programme, setProgramme] = useState();
+    const [programmeDetil, setProgrammeDetil] = useState([]);
+    const [detileOpen, setDetilOpen] = useState(false);
+    const [modalTitle, setModalTitle] = useState("");
     const [messageApi, contextHolder] = message.useMessage();
 
     //获取播放列表及EPG数据
@@ -97,6 +100,7 @@ function App() {
                 title:value.uri,
                 tvgname:tvgname,
                 tvglogo:tvglogo,
+                tvgid:tvgid,
                 nowplay:nowplay,
                 playTime:playTime,
                 percent:Number(percent.toFixed(0))
@@ -116,6 +120,29 @@ function App() {
             <Button onClick={()=>{onLoadMore()}}>加载更多...</Button>
         </div>
     )
+
+    //打开节目详情弹窗
+    const openDetil = (tvgid,tvgname) => {
+        setDetilOpen(true);
+
+        let now = moment().format("yyyyMMDD");
+        let a = programme.filter((value)=>{
+            let start = value._start.split(" ")[0].substr(0,8);
+            let stop = value._stop.split(" ")[0].substr(0,8);
+            if(now>=start&&now<=stop&&value._channel===tvgid){
+                return value
+            }
+        })
+        let temp = [];
+        for (let i = 0; i < a.length; i++) {
+            let start = moment(a[i]._start.split(" ")[0],'YYYYMMDDHHmmss').format("HH:mm:ss")
+            let stop = moment(a[i]._stop.split(" ")[0],'YYYYMMDDHHmmss').format("HH:mm:ss")
+            temp.push(`${start}-${stop}：${a[i].title._text}`)
+        }
+        setProgrammeDetil(temp)
+
+        setModalTitle(`${tvgname}-${now}`)
+    }
 
     useEffect(()=>{
         loadIptvList();
@@ -141,18 +168,19 @@ function App() {
         <div style={{padding:"20px"}}>
             {contextHolder}
             <Row>
-                <Col span={18}><Button type="primary" onClick={()=>{messageApi.success('111')}}>左</Button></Col>
+                <Col span={18}><div id="player-area"></div></Col>
                 <Col span={6}>
                     <List
                         itemLayout="vertical"
                         dataSource={data}
                         loadMore={loadMore}
+                        size="small"
                         renderItem={(item, index) => (
                             <List.Item>
                                 <List.Item.Meta
                                     avatar={<Avatar src={item.tvglogo} style={{width:"81px",height:"48px"}} shape="square" />}
                                     title={<a href={item.title} target="_blank">{index+1}.{item.tvgname}</a>}
-                                    description= {item.nowplay}
+                                    description= {<a onClick={()=>{openDetil(item.tvgid,item.tvgname)}} style={{color:"inherit"}}>{item.nowplay}</a>}
                                 />
                                 <Progress percent={item.percent} size="small" format={()=>item.playTime} />
                             </List.Item>
@@ -163,6 +191,19 @@ function App() {
                     <FloatButton.BackTop target={()=>document.getElementById("li")} />
                 </Col>
             </Row>
+            <Modal
+                open={detileOpen}
+                onCancel={()=>{setDetilOpen(false)}}
+                destroyOnClose="true"
+                title={modalTitle}
+                footer={null}
+            >
+                <List
+                    dataSource={programmeDetil}
+                    style={{height:"calc(100vh - 250px)",overflowY:"auto"}}
+                    renderItem={(item) => <List.Item>{item}</List.Item>}
+                />
+            </Modal>
         </div>
       /*<video id="roomVideo" width="800" height="600" controls preload="auto" data-setup="{}" crossOrigin="Anonymous">
           <source src="http://[2409:8087:7000:20:1000::22]:6060/yinhe/2/ch00000090990000001339/index.m3u8?virtualDomain=yinhe.live_hls.zte.com" type="application/x-mpegURL"></source>
